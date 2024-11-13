@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GCSE Science Quiz</title>
+    <style>
+        body {
+            font-family: 'Comic Sans MS', sans-serif;
+            background-color: #d7e6f4;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            font-size: 28px;
+            margin-bottom: 20px;
+        }
+        .start-button, .chemistry-button {
+            display: block;
+            width: 200px;
+            margin: 20px auto;
+            padding: 15px;
+            font-size: 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: center;
+        }
+        .start-button:hover, .chemistry-button:hover {
+            background-color: #45a049;
+        }
+        .quiz-container {
+            display: none;
+        }
+        .question {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .option {
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: center;
+            font-size: 20px;
+            transition: background-color 0.3s ease;
+        }
+        .option:hover {
+            background-color: #ddd;
+        }
+        .result {
+            text-align: center;
+            font-size: 20px;
+        }
+        #nextBtn {
+            display: none;
+            padding: 20px 40px;
+            font-size: 24px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: center;
+        }
+        #nextBtn:hover {
+            background-color: #45a049;
+        }
+        #homeButton {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            font-size: 20px;
+            background-color: #f44336;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        #homeButton:hover {
+            background-color: #e53935;
+        }
+        .note {
+            text-align: center;
+            font-size: 12px;
+            color: #888;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>GCSE Science Quiz</h1>
+
+    <!-- Home Screen -->
+    <button class="start-button" onclick="startPhysicsQuiz()">Start Physics Quiz</button>
+    <button class="chemistry-button" onclick="startChemistryQuiz()">Start Chemistry Quiz</button>
+
+    <!-- Note below the buttons -->
+    <div class="note">
+        <p>This website is in beta. Please be patient with any bugs and report them to <a href="mailto:revsiongcsebugs@outlook.com">revsiongcsebugs@outlook.com</a></p>
+    </div>
+</div>
+
+<!-- Physics Quiz Section -->
+<div id="physicsQuiz" class="quiz-container">
+    <div class="question" id="question"></div>
+    <div class="options" id="options"></div>
+    <div class="result" id="result"></div>
+    <button id="nextBtn" onclick="nextQuestion()">Next Question</button>
+</div>
+
+<!-- Chemistry Quiz Section -->
+<div id="chemistryQuiz" class="quiz-container">
+    <div class="question" id="chemistryQuestion"></div>
+    <div class="options" id="chemistryOptions"></div>
+    <div class="result" id="chemistryResult"></div>
+    <button id="chemistryNextBtn" onclick="nextChemistryQuestion()">Next Question</button>
+</div>
+
+<!-- Home Button -->
+<button id="homeButton" onclick="goHome()">Home</button>
+
+<script>
+// Shuffle function to randomize the order of options
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]]; // Swap elements
+    }
+}
+
+// Physics Quiz Data
+const physicsQuestions = [
+    {
+        question: "What is the formula for Speed?",
+        options: ["Distance × Time", "Time ÷ Distance", "Distance ÷ Time", "Mass × Speed"],
+        correctAnswer: "Distance ÷ Time"
+    },
+    {
+        question: "What is the formula for Force?",
+        options: ["Mass ÷ Acceleration", "Mass × Acceleration", "Force ÷ Mass", "Force ÷ Acceleration"],
+        correctAnswer: "Mass × Acceleration"
+    },
+    {
+        question: "What is the formula for Work Done?",
+        options: ["Force × Distance", "Force ÷ Distance", "Distance ÷ Force", "Work ÷ Time"],
+        correctAnswer: "Force × Distance"
+    },
+    {
+        question: "What is the formula for Kinetic Energy?",
+        options: ["1/2 × Mass × Speed²", "Mass × Speed²", "1/2 × Mass × Speed", "Force × Distance"],
+        correctAnswer: "1/2 × Mass × Speed²"
+    },
+    {
+        question: "What is the formula for Gravitational Potential Energy?",
+        options: ["Mass × Gravitational Field Strength × Height", "Mass × Height", "Force × Distance", "Mass × Speed²"],
+        correctAnswer: "Mass × Gravitational Field Strength × Height"
+    },
+    {
+        question: "What is the formula for Power?",
+        options: ["Work ÷ Time", "Force × Distance", "Energy ÷ Time", "Force ÷ Time"],
+        correctAnswer: "Work ÷ Time"
+    },
+    {
+        question: "What is the formula for Efficiency?",
+        options: ["Useful Energy Output ÷ Total Energy Input", "Energy Input ÷ Energy Output", "Work ÷ Power", "Total Work ÷ Energy"],
+        correctAnswer: "Useful Energy Output ÷ Total Energy Input"
+    },
+    {
+        question: "What is the formula for Ohm's Law?",
+        options: ["Voltage = Current × Resistance", "Current = Voltage × Resistance", "Resistance = Voltage × Current", "Voltage = Resistance ÷ Current"],
+        correctAnswer: "Voltage = Current × Resistance"
+    },
+    {
+        question: "What is the formula for Charge?",
+        options: ["Current × Time", "Voltage ÷ Time", "Voltage × Current", "Power × Time"],
+        correctAnswer: "Current × Time"
+    },
+    {
+        question: "What is the formula for Pressure in a liquid?",
+        options: ["Density × Gravitational Field Strength × Height", "Pressure ÷ Volume", "Density ÷ Pressure", "Height ÷ Density"],
+        correctAnswer: "Density × Gravitational Field Strength × Height"
+    },
+    // Add more physics questions as needed
+];
+
+// Chemistry Quiz Data
+const chemistryQuestions = [
+    {
+        question: "What is the chemical symbol for water?",
+        options: ["O2", "H2O", "CO2", "H2"],
+        correctAnswer: "H2O"
+    },
+    {
+        question: "What is the atomic number of Carbon?",
+        options: ["6", "12", "8", "14"],
+        correctAnswer: "6"
+    },
+    {
+        question: "What is the chemical symbol for Sodium?",
+        options: ["Na", "K", "S", "Cl"],
+        correctAnswer: "Na"
+    },
+    {
+        question: "What is the molecular formula for methane?",
+        options: ["CH4", "C2H6", "C3H8", "CO2"],
+        correctAnswer: "CH4"
+    },
+    // Add more chemistry questions as needed
+];
+
+let currentPhysicsIndex = 0;
+let currentChemistryIndex = 0;
+let correctAnswers = 0;
+let attempts = 0;
+
+// Start Physics Quiz
+function startPhysicsQuiz() {
+    document.querySelector(".container").style.display = "none";
+    document.getElementById("physicsQuiz").style.display = "block";
+    loadPhysicsQuestion();
+}
+
+// Load Physics Question
+function loadPhysicsQuestion() {
+    attempts = 0; // Reset attempts
+    const questionData = physicsQuestions[currentPhysicsIndex];
+    document.getElementById('question').innerText = questionData.question;
+
+    const optionsContainer = document.getElementById('options');
+    optionsContainer.innerHTML = ''; // Clear previous options
+
+    // Shuffle the options
+    const shuffledOptions = shuffleArray([...questionData.options]);
+
+    shuffledOptions.forEach(option => {
+        const optionElement = document.createElement('div');
+        optionElement.classList.add('option');
+        optionElement.textContent = option;
+        optionElement.onclick = () => checkPhysicsAnswer(option);
+        optionsContainer.appendChild(optionElement);
+    });
+}
+
+// Check Physics Answer
+function checkPhysicsAnswer(selectedAnswer) {
+    const questionData = physicsQuestions[currentPhysicsIndex];
+    const resultContainer = document.getElementById('result');
+    
+    if (selectedAnswer === questionData.correctAnswer) {
+        correctAnswers++;
+        resultContainer.textContent = "Correct! Well done.";
+        document.getElementById('nextBtn').style.display = "block";
+    } else {
+        attempts++;
+        resultContainer.textContent = `Incorrect. You have ${3 - attempts} attempt(s) left.`;
+        
+        if (attempts >= 3) {
+            resultContainer.textContent = `Incorrect. The correct answer is: ${questionData.correctAnswer}.`;
+            document.getElementById('nextBtn').style.display = "block";
+        }
+    }
+}
+
+// Next Physics Question
+function nextQuestion() {
+    if (currentPhysicsIndex < physicsQuestions.length - 1) {
+        currentPhysicsIndex++;
+        loadPhysicsQuestion();
+        document.getElementById('nextBtn').style.display = "none";
+        document.getElementById('result').textContent = "";
+    } else {
+        document.getElementById('result').textContent = "You've completed the Physics quiz!";
+        document.getElementById('nextBtn').style.display = "none";
+    }
+}
+
+// Start Chemistry Quiz
+function startChemistryQuiz() {
+    document.querySelector(".container").style.display = "none";
+    document.getElementById("chemistryQuiz").style.display = "block";
+    loadChemistryQuestion();
+}
+
+// Load Chemistry Question
+function loadChemistryQuestion() {
+    attempts = 0; // Reset attempts
+    const questionData = chemistryQuestions[currentChemistryIndex];
+    document.getElementById('chemistryQuestion').innerText = questionData.question;
+
+    const optionsContainer = document.getElementById('chemistryOptions');
+    optionsContainer.innerHTML = ''; // Clear previous options
+
+    // Shuffle the options
+    const shuffledOptions = shuffleArray([...questionData.options]);
+
+    shuffledOptions.forEach(option => {
+        const optionElement = document.createElement('div');
+        optionElement.classList.add('option');
+        optionElement.textContent = option;
+        optionElement.onclick = () => checkChemistryAnswer(option);
+        optionsContainer.appendChild(optionElement);
+    });
+}
+
+// Check Chemistry Answer
+function checkChemistryAnswer(selectedAnswer) {
+    const questionData = chemistryQuestions[currentChemistryIndex];
+    const resultContainer = document.getElementById('chemistryResult');
+    
+    if (selectedAnswer === questionData.correctAnswer) {
+        correctAnswers++;
+        resultContainer.textContent = "Correct! Well done.";
+        document.getElementById('chemistryNextBtn').style.display = "block";
+    } else {
+        attempts++;
+        resultContainer.textContent = `Incorrect. You have ${3 - attempts} attempt(s) left.`;
+        
+        if (attempts >= 3) {
+            resultContainer.textContent = `Incorrect. The correct answer is: ${questionData.correctAnswer}.`;
+            document.getElementById('chemistryNextBtn').style.display = "block";
+        }
+    }
+}
+
+// Next Chemistry Question
+function nextChemistryQuestion() {
+    if (currentChemistryIndex < chemistryQuestions.length - 1) {
+        currentChemistryIndex++;
+        loadChemistryQuestion();
+        document.getElementById('chemistryNextBtn').style.display = "none";
+        document.getElementById('chemistryResult').textContent = "";
+    } else {
+        document.getElementById('chemistryResult').textContent = "You've completed the Chemistry quiz!";
+        document.getElementById('chemistryNextBtn').style.display = "none";
+    }
+}
+
+// Go Home
+function goHome() {
+    document.querySelector(".container").style.display = "block";
+    document.getElementById("physicsQuiz").style.display = "none";
+    document.getElementById("chemistryQuiz").style.display = "none";
+    document.getElementById('result').textContent = "";
+    document.getElementById('chemistryResult').textContent = "";
+}
+
+</script>
+
+</body>
+</html>
